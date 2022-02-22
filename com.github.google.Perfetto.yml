@@ -1,0 +1,131 @@
+  "app-id": "com.github.google.Perfetto"
+  "runtime": "org.freedesktop.Platform"
+  "runtime-version": "21.08"
+  "sdk": "org.freedesktop.Sdk"
+  "command": "perfetto"
+  finish-args:
+    - --share=ipc
+    - --socket=fallback-x11
+    - --socket=wayland
+    - --share=network
+    - --filesystem=xdg-documents
+    - --device=dri
+
+  modules:
+    - name: perfetto
+      buildsystem: simple
+      build-commands:
+       - mkdir -p buildtools/linux64/ out/linux
+       - mv gnfile buildtools/linux64/gn
+       - chmod +x buildtools/linux64/gn
+       - tools/gn gen --args='is_debug=false' out/linux
+       - tools/build_all_configs.py
+       - ninja -C out/linux tracebox traced traced_probes perfetto
+      post-install:
+        - mkdir -p /app/bin
+        - mv out/ /app/perfetto/
+        - ln -sf ../perfetto/linux/perfetto ${FLATPAK_DEST}/bin/
+        - ln -sf ../perfetto/linux/tracebox /app/bin/
+        - ln -sf ../perfetto/linux/traced /app/bin/
+        - ln -sf ../perfetto/linux/traced_probes /app/bin/
+        - mv test/configs/ /app/perfetto/configs/
+      sources:
+        - type: git
+          url: https://chromium.googlesource.com/external/github.com/google/protobuf.git
+          commit: 6a59a2ad1f61d9696092f79b6d74368b4d7970a3
+          dest: buildtools/protobuf/
+        - type: git
+          url: https://chromium.googlesource.com/external/github.com/llvm/llvm-project/libcxx.git
+          commit: d9040c75cfea5928c804ab7c235fed06a63f743a
+          dest: buildtools/libcxx/
+        - type: git
+          url: https://chromium.googlesource.com/external/github.com/llvm/llvm-project/libcxxabi.git
+          commit: 196ba1aaa8ac285d94f4ea8d9836390a45360533
+          dest: buildtools/libcxxabi/
+        - type: git
+          url: https://chromium.googlesource.com/external/github.com/llvm/llvm-project/libunwind.git
+          commit: d999d54f4bca789543a2eb6c995af2d9b5a1f3ed
+          dest: buildtools/libunwind/
+        - type: git
+          url: https://android.googlesource.com/platform/external/zlib.git
+          commit: 5c85a2da4c13eda07f69d81a1579a5afddd35f59
+          dest: buildtools/zlib/
+        - type: git
+          url: https://android.googlesource.com/platform/system/core.git
+          commit: 9e6cef7f07d8c11b3ea820938aeb7ff2e9dbaa52
+          dest: buildtools/android-core/
+        - type: git
+          url: https://android.googlesource.com/platform/system/unwinding.git
+          commit: b61aebb7f7afaad9b775a59dcd0ea6289fc4325a
+          dest: buildtools/android-unwinding/
+        - type: git
+          url: https://android.googlesource.com/platform/system/logging.git
+          commit: 7b36b566c9113fc703d68f76e8f40c0c2432481c
+          dest: buildtools/android-logging/
+        - type: git
+          url: https://android.googlesource.com/platform/system/libbase.git
+          commit: 78f1c2f83e625bdf66d55b48bdb3a301c20d2fb3
+          dest: buildtools/android-libbase/
+        - type: git
+          url: https://android.googlesource.com/platform/system/libprocinfo.git
+          commit: fd214c13ededecae97a3b15b5fccc8925a749a84
+          dest: buildtools/android-libprocinfo/
+        - type: git
+          url: https://android.googlesource.com/platform/bionic.git
+          commit: 332065d57e734b65f56474d136d22d767e36cbcd
+          dest: buildtools/bionic/
+        - type: git
+          url: https://android.googlesource.com/platform/external/lzma.git
+          commit: 7851dce6f4ca17f5caa1c93a4e0a45686b1d56c3
+          dest: buildtools/lzma/
+        - type: git
+          url: https://chromium.googlesource.com/external/github.com/open-source-parsers/jsoncpp.git
+          commit: 6aba23f4a8628d599a9ef7fa4811c4ff6e4070e2
+          dest: buildtools/jsoncpp/
+        - type: git
+          url: https://fuchsia.googlesource.com/third_party/linenoise.git
+          commit: c894b9e59f02203dbe4e2be657572cf88c4230c3
+          dest: buildtools/linenoise/
+        - type: git
+          url: https://chromium.googlesource.com/external/github.com/google/benchmark.git
+          commit: 090faecb454fbd6e6e17a75ef8146acb037118d4
+          dest: buildtools/benchmark/
+        - type: git
+          url: https://android.googlesource.com/platform/external/googletest.git
+          commit: 3f05f651ae3621db58468153e32016bc1397800b
+          dest: buildtools/googletest/
+        - type: git
+          url: https://chromium.googlesource.com/chromium/llvm-project/cfe/tools/clang-format.git
+          commit: 96636aa0e9f047f17447f2d45a094d0b59ed7917
+          dest: buildtools/clang_format/script
+        - type: archive
+          url: https://storage.googleapis.com/perfetto/sqlite-amalgamation-3350400.zip
+          sha256: f3bf0df69f5de0675196f4644e05d07dbc698d674dc563a12eff17d5b215cdf5
+          dest: buildtools/sqlite/
+        - type: git
+          url: https://chromium.googlesource.com/external/github.com/sqlite/sqlite.git
+          commit: ee3686eb50c0e3dbb087c9a0976f7e37e1b014ae
+          dest: buildtools/sqlite_src/
+        - type: archive
+          url: https://storage.googleapis.com/perfetto/libbacktrace-177940370e4a6b2509e92a0aaa9749184e64af43.zip
+          sha256: 21ac9a4209f7aeef766c482be53a7fa365063c031c7077e2070b491202983b31
+          dest: buildtools/libbacktrace/
+        - type: git
+          url: https://chromium.googlesource.com/chromium/llvm-project/compiler-rt/lib/fuzzer.git
+          commit: debe7d2d1982e540fbd6bd78604bf001753f9e74
+          dest: buildtools/libfuzzer/
+          
+        - type: archive
+          url: https://commondatastorage.googleapis.com/chromium-browser-clang/Linux_x64/clang-llvmorg-14-init-3191-g0e03450a-1.tgz
+          sha256: dd7479d43ce61401e057a5dee8b7e32bc2bd0d0e15d4f46c6858daf9170c9978
+          dest: buildtools/linux64/clang/
+          strip-components: 0
+        - type: file
+          url: https://storage.googleapis.com/perfetto/gn-linux64-1968-0725d782
+          dest-filename: gnfile
+          sha256: f706aaa0676e3e22f5fc9ca482295d7caee8535d1869f99efa2358177b64f5cd
+        - type: archive
+          url: https://github.com/google/perfetto/archive/refs/tags/v24.2.tar.gz
+          sha256: b296d0a939e694fd2e73ed6c6418b774b5ef6809ddf60988989416e5cbf90b41
+        - type: patch
+          path: 0001-remove-deps_check.patch
